@@ -1,3 +1,5 @@
+// connect to the database and configure mongoose
+
 var mongoose = require('mongoose');
 
 //tell mongoose to use promises
