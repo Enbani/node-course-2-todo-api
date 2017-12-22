@@ -3,7 +3,7 @@
 // library imports
 var express = require('express');
 var bodyParser = require('body-parser');
-
+const {ObjectID} = require('mongodb'); // ObjectID pulled from mongodb
 
 // local imports
 // object destructuring ES6 syntax
@@ -42,6 +42,7 @@ app.post('/todos', (req, res) => {
 	});
 });
 
+
 app.get('/todos', (req, res) => {
 	Todo.find().then((todos) => {
 		res.send({todos});
@@ -52,7 +53,27 @@ app.get('/todos', (req, res) => {
 
 });
 
+// GET /todos/{id}
 
+app.get('/todos/:id', (req, res) => {
+	var id = req.params.id;
+
+	//isValid() is a method of ObjID 
+	if (!ObjectID.isValid(id)) {
+		res.status(404).send();
+	}
+
+	Todo.findById(id).then((todo) => {
+		if (!todo) {
+			 res.status(404).send();
+		}
+
+		res.send(todo);
+	}).catch((e) => {
+		res.status(400).send();
+	});
+
+});
 
 app.listen(3000, () => {
 	console.log('Started on port 3000');
