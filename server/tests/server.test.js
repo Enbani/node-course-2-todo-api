@@ -3,12 +3,14 @@ const expect = require('expect');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
-
+const {ObjectID} = require('mongodb');
 
 const todos = [{
-	text: 'Learn Mandarin'
-}, { 
-	text: 'Become a master audiophile'
+	text: 'Learn Mandarin',
+	_id: new ObjectID()
+}, {
+	text: 'Become a master audiophile',
+	_id: new ObjectID()
 }]
 
 
@@ -77,4 +79,37 @@ describe('GET /todos', () => {
 		})
 		.end(done);
 	});
+})
+
+// use done() as a parameter in tests that are async
+describe('GET /todos/:id',() =>{
+	it('should return the todo doc', (done) => {
+		request(app)
+			.get(`/todos/${todos[0]._id.toHexString()}`)
+			.expect(200)
+			.expect((res) => {
+				console.log(res.body);
+				expect(res.body.text).toBe(todos[0].text);
+			})
+			.end(done);
+	})
+
+	it('should return 404 if todo not found', (done) => {
+		var id = new ObjectID().toHexString();
+		//make sure to get a 404 back
+
+		request(app)
+			.get(`/todos/${id}`)
+			.expect(404)
+			.end(done);
+	});
+
+
+	it('should return a 404 for non-object ids', (done) => {
+    // todos/123
+		request(app)
+			.get(`/todos/123`)
+			.expect(404)
+			.end(done);
+	})
 })
