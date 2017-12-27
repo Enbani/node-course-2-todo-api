@@ -13,9 +13,12 @@ var {User} = require('./models/user');
 
 // store express application
 var app = express();
+// process.env.PORT will be available if running on heroku
+// otherwise, use 3000
+const port = process.env.PORT || 3000;
 
 // configure middleware
-// app.use() takes middleware. 
+// app.use() takes middleware.
 	// function if custom middleware.
 	// something off of the library if third party
 app.use(bodyParser.json());
@@ -58,7 +61,7 @@ app.get('/todos', (req, res) => {
 app.get('/todos/:id', (req, res) => {
 	var id = req.params.id;
 
-	//isValid() is a method of ObjID 
+	//isValid() is a method of ObjID
 	if (!ObjectID.isValid(id)) {
 		res.status(404).send();
 	}
@@ -75,8 +78,8 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
-app.listen(3000, () => {
-	console.log('Started on port 3000');
+app.listen(port, () => {
+	console.log(`Started at port ${port}`);
 });
 
 module.exports ={app};
