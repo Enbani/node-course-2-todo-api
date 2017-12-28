@@ -1,5 +1,7 @@
 // server.js will only be responsible for routes
 
+require('./config/config.js')
+
 // library imports
 const _ = require('lodash');
 const express = require('express');
@@ -16,7 +18,7 @@ var {User} = require('./models/user');
 var app = express();
 // process.env.PORT will be available if running on heroku
 // otherwise, use 3000
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 // configure middleware
 // app.use() takes middleware.
