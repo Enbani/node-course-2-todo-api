@@ -1,6 +1,6 @@
 // server.js will only be responsible for routes
 
-require('./config/config.js')
+require('./config/config.js');
 
 // library imports
 const _ = require('lodash');
@@ -147,6 +147,35 @@ app.patch('/todos/:id', (req, res) => {
 });
 
 
+
+// POST /users
+// use _.pick from lodash to POST
+
+app.post('/users', (req, res) => {
+
+  // use lodash to pick properties off the req
+	var body = _.pick(req.body, ['email', 'password']);
+  // create a new user based on User Schema
+	var user = new User(body);
+
+  // save the user, then call the generateAuthToken() method
+	user.save().then(() => {
+    // this method returns the auth token
+		return user.generateAuthToken();
+
+		// res.send(user);
+	}).then((token) => {
+    // send the token in the header, also send the full user doc
+		res.header('x-auth', token).send(user);
+	}).catch((e) =>{
+		res.status(400).send(e);
+	});
+});
+
+
+
+
+// start the server
 app.listen(port, () => {
 	console.log(`Started at port ${port}`);
 });

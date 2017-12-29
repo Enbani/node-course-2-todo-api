@@ -1,15 +1,75 @@
 // require mongoose and create a model for the User collection
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
-var User = mongoose.model('User', { 
+// Schema lets you define new schema in order to add custom methods
+var UserSchema = new mongoose.Schema({
 	email: {
 		type: String,
 		required: true,
 		trim: true,
-		minlength: 1
-	}
+		minlength: 1,
+		unique: true,
+		validate:{
+			isAsync: false,
+			validator: validator.isEmail,
+			message: '{VALUE} is not a valid email'
+		}
+	},
+	password: {
+		type: String,
+		require: true,
+		minlength: 6
+	},
+	tokens: [{
+		access: {
+			type: String,
+			require: true
+		},
+		token: {
+			type: String,
+			require: true
+		}
+
+	}]
+
 });
+
+// create instance methods
+UserSchema.methods.toJSON = function () {
+  //determines what gets sent back in response when model is converted to json value
+  // automatically called when we respond to express request with res.send
+  // res.send calls JSON.stringify, which calls toJSON. toJSON customizes JSON.stringify behavior
+  // more info: https://stackoverflow.com/questions/20734894/difference-between-tojson-and-json-stringify
+	
+
+	var user = this;
+	var userObject = user.toObject()
+
+	return _.pick(userObject, ['_id', 'email']);
+}
+
+UserSchema.methods.generateAuthToken = function () {
+  // create access value and token
+	var user = this;
+	var access = 'auth';
+	var token = jwt.sign({_id: user._id.toHexString(), access}, 'secret').toString();
+
+
+  // create new array and set values as specified above
+	user.tokens = user.tokens.concat([{access, token}]);
+
+  // return a promise with the token that can be used in server.js
+	return user.save().then(() => {
+		return token;
+	});
+};
+
+
+var User = mongoose.model('User', UserSchema);
 
 
 // export to be used in server.js
