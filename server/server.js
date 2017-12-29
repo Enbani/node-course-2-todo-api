@@ -13,6 +13,7 @@ const {ObjectID} = require('mongodb'); // ObjectID pulled from mongodb
 var {mongoose} = require('./db/mongoose')
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 // store express application
 var app = express();
@@ -172,6 +173,11 @@ app.post('/users', (req, res) => {
 	});
 });
 
+
+
+app.get('/users/me', authenticate, (req, res) => {
+	res.send(req.user);
+})
 
 
 

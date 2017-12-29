@@ -38,13 +38,13 @@ var UserSchema = new mongoose.Schema({
 
 });
 
-// create instance methods
+// create instance methods, these get called with the document as the binding
 UserSchema.methods.toJSON = function () {
   //determines what gets sent back in response when model is converted to json value
   // automatically called when we respond to express request with res.send
   // res.send calls JSON.stringify, which calls toJSON. toJSON customizes JSON.stringify behavior
   // more info: https://stackoverflow.com/questions/20734894/difference-between-tojson-and-json-stringify
-	
+
 
 	var user = this;
 	var userObject = user.toObject()
@@ -54,6 +54,8 @@ UserSchema.methods.toJSON = function () {
 
 UserSchema.methods.generateAuthToken = function () {
   // create access value and token
+
+
 	var user = this;
 	var access = 'auth';
 	var token = jwt.sign({_id: user._id.toHexString(), access}, 'secret').toString();
@@ -68,6 +70,27 @@ UserSchema.methods.generateAuthToken = function () {
 	});
 };
 
+// like methods, but turns into model opposed to instance method
+// these get called with the model as the binding
+UserSchema.statics.findByToken = function (token) {
+	var User = this;
+	var decoded;
+
+	try {
+		decoded = jwt.verify(token, 'secret');
+    // this will decode the token, which contains the object it was created with
+	} catch (e) {
+		return new Promise((resolve, reject) => {
+			return reject();
+		})
+	}
+
+	return User.findOne({
+		_id: decoded._id,
+		'tokens.access': 'auth',
+		'tokens.token': token
+	})
+}
 
 var User = mongoose.model('User', UserSchema);
 
