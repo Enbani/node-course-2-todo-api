@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
-
+const bcrypt = require('bcryptjs');
 // Schema lets you define new schema in order to add custom methods
 var UserSchema = new mongoose.Schema({
 	email: {
@@ -92,6 +92,25 @@ UserSchema.statics.findByToken = function (token) {
 	})
 }
 
+//mongoose middleware: before the specified event "save", run this function
+// function called with next in order to allow middleware to complete
+
+// this will help store an encrypted hash for the user password
+UserSchema.pre('save', function(next) {
+	var user = this;
+
+	if (user.isModified('password')) {
+    // hash password and set it to the password
+		bcrypt.genSalt(10, (err, salt) => {
+			var hash = bcrypt.hash(user.password, salt, (err, hash) => {
+			user.password = hash;
+			next();
+			})
+		})
+	} else {
+		next();
+	}
+})
 var User = mongoose.model('User', UserSchema);
 
 

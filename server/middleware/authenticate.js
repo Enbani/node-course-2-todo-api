@@ -2,8 +2,10 @@ var {User} = require('./../models/user');
 
 
 var authenticate = (req, res, next) => {
+  // get token from request header
 	var token = req.header('x-auth');
 
+  // use custom static to find the user, then handle authentication
 	User.findByToken(token).then((user) => {
 		if (!user){
 			return Promise.reject();
