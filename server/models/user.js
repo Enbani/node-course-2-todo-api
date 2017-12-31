@@ -92,6 +92,25 @@ UserSchema.statics.findByToken = function (token) {
 	})
 }
 
+
+UserSchema.statics.findByCredentials = function (email, password) {
+ 	var User = this;
+
+	return User.findOne({email}).then((user) => {
+		if (!user) {
+			return Promise.reject();
+		}
+
+		return bcrypt.compare(password, user.password).then((res) => {
+			if (res) {
+				return user;
+			} else {
+				return Promise.reject();
+			}
+		});
+	});
+}
+
 //mongoose middleware: before the specified event "save", run this function
 // function called with next in order to allow middleware to complete
 
