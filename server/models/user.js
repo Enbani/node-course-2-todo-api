@@ -70,6 +70,23 @@ UserSchema.methods.generateAuthToken = function () {
 	});
 };
 
+UserSchema.methods.removeToken = function (token) {
+  // $pull mongodb operator lets you remove items from an array with a certain criteria
+
+	var user = this;
+
+  // this will pull the entire object with the following criteria
+	return user.update({
+		$pull: {
+			tokens:{token}
+		}
+	});
+};
+
+
+
+
+
 // like methods, but turns into model opposed to instance method
 // these get called with the model as the binding
 UserSchema.statics.findByToken = function (token) {
