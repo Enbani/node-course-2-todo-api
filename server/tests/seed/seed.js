@@ -12,23 +12,32 @@ const users = [{
     password: 'user1pass',
     tokens: [{
       access: 'auth',
-      token: jwt.sign({_id: userOneId, access: 'auth'}, 'secret').toString()
+      token: jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET).toString()
     }]
   },{
     _id: userTwoId,
     email: 'melissa@gmail.com',
-    password: 'user2pass'
+    password: 'user2pass',
+    tokens: [{
+      access: 'auth',
+      token: jwt.sign({_id: userTwoId, access: 'auth'}, process.env.JWT_SECRET).toString()
+    }]
   }];
 
 const todos = [{
 	text: 'Learn Mandarin',
-	_id: new ObjectID()
+	_id: new ObjectID(),
+  _creator: userOneId
 }, {
 	text: 'Become a master audiophile',
 	_id: new ObjectID(),
 	completed: true,
-	completedAt: 333
+	completedAt: 333,
+  _creator: userTwoId
 }];
+
+
+
 
 const populateTodos = (done) => {
 	Todo.remove({}).then(() => {

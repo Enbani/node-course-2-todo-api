@@ -1,3 +1,5 @@
+// authenticate will find a user by token then alter the request to set the user and token
+
 var {User} = require('./../models/user');
 
 
